@@ -1,20 +1,48 @@
-import { StatusBar } from "expo-status-bar";
-import { SafeAreaView, StyleSheet, Switch, Text, View } from "react-native";
+import React, { useState } from "react";
+import { NavigationContainer } from "@react-navigation/native";
+import { createStackNavigator } from "@react-navigation/stack";
 import { useColorScheme } from "nativewind";
+import { StatusBar } from "expo-status-bar";
+import Register from "./components/Register";
+import Login from "./components/Login";
 import ProductsList from "./components/ProductsList";
+
+const Stack = createStackNavigator();
 
 export default function App() {
   const { colorScheme, toggleColorScheme } = useColorScheme();
+  const [registered, setRegistered] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(false);
+
+  const handleRegistrationComplete = () => {
+    setRegistered(true);
+    setLoggedIn(true); // Navigate to the login screen after registration
+  };
+
+  const handleLoginComplete = () => {
+    setLoggedIn(true);
+  };
+
   return (
-    <SafeAreaView className="flex-1 items-center justify-center bg-gray-200 dark:bg-black">
-      <View className={"flex-row w-full gap-5"}>
-        <Text className="dark:text-white text-2xl font-bold">
-          New collection
-        </Text>
-        <Switch value={colorScheme === "dark"} onChange={toggleColorScheme} />
-      </View>
-      <ProductsList />
+    <NavigationContainer>
       <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
-    </SafeAreaView>
+      <Stack.Navigator>
+        <Stack.Screen
+          name="Register"
+          component={Register}
+          initialParams={{
+            onRegistrationComplete: handleRegistrationComplete,
+          }}
+        />
+
+        <Stack.Screen name="ProductsList" component={ProductsList} />
+
+        <Stack.Screen
+          name="Login"
+          component={Login}
+          initialParams={{ onLoginComplete: handleLoginComplete }}
+        />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
